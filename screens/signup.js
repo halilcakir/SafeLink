@@ -14,17 +14,15 @@ export default function Signup() {
     <Text style={{fontSize:32, textAlign:'center', paddingBottom:25}}>SignUp</Text>
 
     <View style={styles.inputContainer}>
-    
       <Icon name="user" size={25} color="#888" style={styles.icon} />
-      <TextInput style={styles.textinput}
-    placeholder='Username'></TextInput>
+      <TextInput style={styles.textinput} placeholder='Username'></TextInput>
     </View>
 
 
     <View style={styles.inputContainer}>
         <Icon name='envelope' size={20} color="#888"></Icon>
     <TextInput style={styles.textinput}
-         placeholder='Email'> 
+         placeholder='Email' inputMode='email'> 
          </TextInput>
     </View>
    
@@ -32,15 +30,15 @@ export default function Signup() {
 
     <View style={styles.inputContainer}>
     <Icon name='lock' size={25} color="#888" ></Icon>
-    <TextInput style={styles.textinput} placeholder='Password'></TextInput></View>
+    <TextInput style={styles.textinput} placeholder='Password' secureTextEntry={true} ></TextInput></View>
     
     <View style={styles.inputContainer}>
     <Icon name='lock' size={25} color="#888" ></Icon>
-    <TextInput style={styles.textinput}placeholder='Confirm Password'></TextInput>
+    <TextInput style={styles.textinput} placeholder='Confirm Password' secureTextEntry={true}></TextInput>
     </View>
     <View style={styles.PressableContainer}>
     <Pressable style={styles.signupPressable}>
-        <Text>SignUp</Text>
+        <Text style={{color:'white', fontWeight:'600', fontSize:18}}>SignUp</Text>
     </Pressable>
     </View>
     </View>
@@ -70,7 +68,7 @@ const styles= StyleSheet.create({
         textAlign:'center',
         fontSize:20,
         textAlign:'left',
-        paddingLeft:10
+        marginLeft:20
 
 
         
@@ -82,13 +80,12 @@ const styles= StyleSheet.create({
         marginVertical: 10,
         borderBottomWidth:1
       },
-      icon: {
-        marginRight: 10, // Icon ile TextInput arasında boşluk
-      },
+ 
       input: {
         flex: 1, // TextInput'un genişliğini otomatik olarak ayarlayalım
         height: 40,
       },
+
       signupPressable:{
         backgroundColor:'#7886C7',
         marginTop:50,
@@ -96,7 +93,8 @@ const styles= StyleSheet.create({
         alignItems:'center',
         borderRadius:10,
         height:50,
-        justifyContent:'center'
+        justifyContent:'center',
+       
 
       },PressableContainer:{
         flex:1,
