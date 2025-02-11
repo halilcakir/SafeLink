@@ -14,7 +14,7 @@ export default function Signup() {
     <Text style={{fontSize:32, textAlign:'center', paddingBottom:25}}>SignUp</Text>
 
     <View style={styles.inputContainer}>
-      <Icon name="user" size={25} color="#888" style={styles.icon} />
+      <Icon name="user" size={25} color="#888" />
       <TextInput style={styles.textinput} placeholder='Username'></TextInput>
     </View>
 

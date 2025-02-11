@@ -1,9 +1,9 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import React from 'react'
 import { useState } from 'react'
-
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faEye } from '@fortawesome/free-solid-svg-icons'
+import { faEye, faLink } from '@fortawesome/free-solid-svg-icons'
 import {
     createStaticNavigation,
     useNavigation,
@@ -20,7 +20,7 @@ export default function Login() {
 
 
     <View style={styles.container}>
-       <FontAwesomeIcon icon={faEye} size={125} style={{color: "#29126e", }} />
+       <FontAwesomeIcon icon={faLink} size={125} style={{color: "#29126e", }} />
         <View style={styles.loginContent}>
       
         <Text style={
@@ -31,11 +31,15 @@ export default function Login() {
             }}>
             Welcome</Text>
 
-            <Text>Username:</Text>
-            <TextInput placeholder="Username" style={styles.textinput}></TextInput>
-            <Text>Password:</Text>
-            <TextInput placeholder='Password' style={styles.textinput}></TextInput>
+           <View style={styles.InputContainer}>
+           <Icon name="user" size={25} color="#888" style={styles.icon} />
+           <TextInput placeholder="Username" style={styles.textinput}></TextInput>
+           </View>
             
+            <View style={styles.InputContainer}>
+            <Icon name='lock' size={25} color="#888" ></Icon>
+            <TextInput placeholder='Password' style={styles.textinput}></TextInput>
+            </View>
 
         </View>
         <Pressable onPressIn={()=>{SetisPressed(true)}} 
@@ -81,10 +85,10 @@ const styles = StyleSheet.create({
     },
     textinput:{
 
-        borderWidth:1,
+        fontSize:18,
         height:50,
-        borderRadius:10,
-        textAlign:'center'
+        textAlign:'center',
+        marginLeft:20
 
     },
     loginPressable:{
@@ -116,5 +120,14 @@ const styles = StyleSheet.create({
         height:50,
         borderRadius:10,
         justifyContent:'center'
+    },
+    InputContainer:{
+        flexDirection: 'row', // Icon ve TextInput'u yatayda hizaladık
+        alignItems: 'center', // Dikeyde hizalama
+        borderColor: '#ccc',
+        paddingHorizontal: 10,
+        marginVertical: 10,
+        borderBottomWidth:1
+        
     }
 })
