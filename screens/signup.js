@@ -38,7 +38,7 @@ export default function Signup() {
     </View>
     <View style={styles.PressableContainer}>
     <Pressable style={styles.signupPressable}>
-        <Text style={{color:'white', fontWeight:'600', fontSize:18}}>SignUp</Text>
+        <Text style={{color:'white', fontWeight:'600', fontSize:18, fontFamily:''}}>SignUp</Text>
     </Pressable>
     </View>
     </View>

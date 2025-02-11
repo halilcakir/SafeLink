@@ -1,30 +1,22 @@
+
+// In App.js in a new project
+
 import * as React from 'react';
 import { View, Text } from 'react-native';
 import { createStaticNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Login from './screens/login';
-import Signup from './screens/signup';
 
-
+function HomeScreen() {
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text>Home Screen</Text>
+    </View>
+  );
+}
 
 const RootStack = createNativeStackNavigator({
-  
-  initialRouteName:'Login',
   screens: {
-    Signup:{ screen:Signup,
-              options:{
-                title:'',
-                headerTransparent:true
-              }
-            
-    } ,
-    Login: {
-      screen:Login,
-      options:{
-        headerShown:false
-      }
-    }
-
+    Home: HomeScreen,
   },
 });
 

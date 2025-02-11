@@ -4,12 +4,17 @@ import { useState } from 'react'
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faEye } from '@fortawesome/free-solid-svg-icons'
+import {
+    createStaticNavigation,
+    useNavigation,
+  } from '@react-navigation/native';
 
 
 
 export default function Login() {
 
     const [isPressed, SetisPressed] = useState(false) 
+    const navigation = useNavigation()
 
   return (
 
@@ -46,7 +51,7 @@ export default function Login() {
                 }}>Login</Text>
 
             </Pressable>
-            <Pressable style={styles.signupPressable}>
+            <Pressable style={styles.signupPressable} onPress={()=> navigation.navigate('Signup')}>
                 <Text style={{
                     color:'white',
                     textAlign:'center',
