@@ -1,20 +1,22 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import React from 'react'
-import { useState } from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faEye, faLink } from '@fortawesome/free-solid-svg-icons'
-import {
-    createStaticNavigation,
-    useNavigation,
-  } from '@react-navigation/native';
+import { faLink } from '@fortawesome/free-solid-svg-icons'
+import { useSelector, useDispatch } from 'react-redux';
+import { setEmail,setPassword } from '../redux/userSlice';
+import { text } from '@fortawesome/fontawesome-svg-core';
 
+export default function Login({navigation}) {
 
+    const isPressed = false
+    // userslice içerisindeki verilerin okunması
 
-export default function Login() {
-
-    const [isPressed, SetisPressed] = useState(false) 
-    const navigation = useNavigation()
+    const {email,password} = useSelector((state)=>state.user)
+    const dispatch = useDispatch() 
+    console.log("email",email)
+    console.log("password", password)
+  // Redux Store'dan email çekiliyor
 
   return (
 
@@ -33,12 +35,26 @@ export default function Login() {
 
            <View style={styles.InputContainer}>
            <Icon name="user" size={25} color="#888" style={styles.icon} />
-           <TextInput placeholder="Username" style={styles.textinput}></TextInput>
+           <TextInput 
+            placeholder="Username" 
+            style={styles.textinput}
+            value={email}
+            onChangeText={(text) => {
+                dispatch(setEmail(text)); // Redux state güncelleniyor // Debug log
+              }}
+            
+            
+           
+            
+           ></TextInput>
            </View>
             
             <View style={styles.InputContainer}>
             <Icon name='lock' size={25} color="#888" ></Icon>
-            <TextInput placeholder='Password' style={styles.textinput}></TextInput>
+            <TextInput placeholder='Password' 
+            value={password}
+            style={styles.textinput}
+            onChangeText={(text)=> dispatch(setPassword(text))}></TextInput>
             </View>
 
         </View>
@@ -88,7 +104,9 @@ const styles = StyleSheet.create({
         fontSize:18,
         height:50,
         textAlign:'center',
-        marginLeft:20
+        paddingRight:20,
+        flex:1,
+       
 
     },
     loginPressable:{
