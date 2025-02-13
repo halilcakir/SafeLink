@@ -1,21 +1,23 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faLink } from '@fortawesome/free-solid-svg-icons'
 import { useSelector, useDispatch } from 'react-redux';
-import { setEmail,setPassword } from '../redux/userSlice';
-import { text } from '@fortawesome/fontawesome-svg-core';
+import { login } from '../redux/userSlice';
+
 
 export default function Login({navigation}) {
-
+    const [email, setEmail] = useState('')
+    console.log("email",email)
+    const [password, setPassword] = useState('')
+    console.log("password",password)
     const isPressed = false
     // userslice içerisindeki verilerin okunması
 
-    const {email,password} = useSelector((state)=>state.user)
+    const {isAuth} = useSelector((state)=>state.user)
     const dispatch = useDispatch() 
-    console.log("email",email)
-    console.log("password", password)
+
   // Redux Store'dan email çekiliyor
 
   return (
@@ -40,7 +42,7 @@ export default function Login({navigation}) {
             style={styles.textinput}
             value={email}
             onChangeText={(text) => {
-                dispatch(setEmail(text)); // Redux state güncelleniyor // Debug log
+                setEmail(text); // Redux state güncelleniyor // Debug log
               }}
             
             
@@ -54,12 +56,17 @@ export default function Login({navigation}) {
             <TextInput placeholder='Password' 
             value={password}
             style={styles.textinput}
-            onChangeText={(text)=> dispatch(setPassword(text))}></TextInput>
+            onChangeText={(text)=> setPassword(text)}></TextInput>
             </View>
 
         </View>
-        <Pressable onPressIn={()=>{SetisPressed(true)}} 
-                   onPressOut={()=>{SetisPressed(false)}} 
+        <Pressable 
+               
+               onPress={()=>{
+                dispatch(login({email,password}))
+                
+               }}
+                
                    style={ 
 
             isPressed ? 
