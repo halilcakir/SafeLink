@@ -4,8 +4,7 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 
 export const login = createAsyncThunk('user/login',async({email,password})=>{
-      console.log("email",email)
-      console.log("password",password)
+
   try {
       const auth = getAuth();
       const userCredential = await signInWithEmailAndPassword(auth, email,password)
@@ -25,8 +24,6 @@ export const login = createAsyncThunk('user/login',async({email,password})=>{
     
   }
 }) 
-
-
 
 
 
@@ -55,6 +52,7 @@ const userSlice = createSlice({
     setisAuth:(state,action) => {
       state.isAuth = action.payload;
     },
+
   },
   extraReducers:(builder)=>{
     builder

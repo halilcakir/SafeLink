@@ -1,7 +1,7 @@
 import * as React from 'react';
-import RootNativigation from './src/components/navigation/rootNativigation';
+import RootNativigation from './src/navigation/rootNativigation';
 import { Provider } from 'react-redux';
-import { store } from './src/components/redux/store';
+import { store } from './src/redux/store';
 
 
 

@@ -5,19 +5,20 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faLink } from '@fortawesome/free-solid-svg-icons'
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from '../redux/userSlice';
+import Loading from './loading';
 
 
 export default function Login({navigation}) {
     const [email, setEmail] = useState('')
-    console.log("email",email)
     const [password, setPassword] = useState('')
-    console.log("password",password)
+
     const isPressed = false
     // userslice içerisindeki verilerin okunması
 
-    const {isAuth} = useSelector((state)=>state.user)
+    const {isAuth,isLoading} = useSelector((state)=>state.user)
     const dispatch = useDispatch() 
-
+    const mail ='test@test.com'
+    const pass = '123456'
   // Redux Store'dan email çekiliyor
 
   return (
@@ -32,8 +33,7 @@ export default function Login({navigation}) {
                 fontSize:32,
                 textAlign:'center'
                 
-            }}>
-            Welcome</Text>
+            }}>Welcome</Text>
 
            <View style={styles.InputContainer}>
            <Icon name="user" size={25} color="#888" style={styles.icon} />
@@ -41,19 +41,15 @@ export default function Login({navigation}) {
             placeholder="Username" 
             style={styles.textinput}
             value={email}
-            onChangeText={(text) => {
-                setEmail(text); // Redux state güncelleniyor // Debug log
+            onChangeText={(text) => {setEmail(text.toLowerCase()); // Redux state güncelleniyor // Debug log
               }}
-            
-            
-           
-            
            ></TextInput>
            </View>
             
             <View style={styles.InputContainer}>
             <Icon name='lock' size={25} color="#888" ></Icon>
             <TextInput placeholder='Password' 
+            secureTextEntry={true}
             value={password}
             style={styles.textinput}
             onChangeText={(text)=> setPassword(text)}></TextInput>
@@ -78,7 +74,8 @@ export default function Login({navigation}) {
                 }}>Login</Text>
 
             </Pressable>
-            <Pressable style={styles.signupPressable} onPress={()=> navigation.navigate('Signup')}>
+            <Pressable style={styles.signupPressable} 
+                onPress={()=> navigation.navigate('Signup')}>
                 <Text style={{
                     color:'white',
                     textAlign:'center',
@@ -88,7 +85,13 @@ export default function Login({navigation}) {
                 >
                     SignUp</Text>
             </Pressable>
-
+            {
+                isLoading
+                ? <Loading />
+                : null
+                
+            }
+                
     </View>
   )
 }
@@ -98,6 +101,7 @@ const styles = StyleSheet.create({
         flex:1,
         alignItems:"center",
         justifyContent:'center',
+       
     },
     loginContent:{
         
@@ -154,5 +158,8 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         borderBottomWidth:1
         
+    },
+    hidden:{
+        visibility: 'hidden'
     }
 })
