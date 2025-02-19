@@ -1,135 +1,233 @@
-import { Pressable, StyleSheet, Text, View , FlatList,TextInput} from 'react-native'
-import React from 'react'
-import { collection, addDoc } from "firebase/firestore"; 
+import { Pressable, StyleSheet, Text, View, FlatList, TextInput, Modal, Linking } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { collection, addDoc, getDocs, setDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 import CustomPressable from '../components/customPressable';
-import { Modal } from 'react-native';
-import { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSelector, useDispatch } from 'react-redux';
+
+
+
+
+
 
 const HomePage = () => {
 
-  const sendData = async()=>{
-        try {
-          const docRef = await addDoc(collection(db, "users"), {
-            first: "Ada",
-            last: "Lovelace",
-            born: 1815
-          });
-          console.log("Document written with ID: ", docRef.id);
-        } catch (e) {
-          console.error("Error adding document: ", e);
-        }
-    } 
-    const DATA = [
-      {
-        id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-        title: 'First Item',
-      },
-      {
-        id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-        title: 'Second Item',
-      },
-      {
-        id: '58694a0f-3da1-471f-bd96-145571e29d72',
-        title: 'Third Item',
-      },
-    ];
-    
-    const Item = ({title}) => (
-      <View style={styles.item}>
-        <Text style={styles.title}>{title}</Text>
-      </View>
-    );
-  
-    const [modalVisible, setModalVisible] = useState(false);
+  const {userid} = useSelector((state)=>state.user)
+  const [doclist, setdoclist] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [link, setLink] = useState('');
+  const [title, setTitle] = useState('');
+  const [userID, setUserId] = useState('')
 
+
+
+
+  const handleLinkPress = (link) => {
+      Linking.openURL(link).catch((err) => console.error('An error occurred', err));
+   
+  };
+
+
+
+
+  // Veriyi Firestore'a ekleyen fonksiyon
+  const sendData = async (linkTitle, linkContent ) => {
+   
+    
+    const data = {
+      uuid:0,
+      title:linkTitle ,
+      link:'http://'+linkContent ,
+    };
+  
+    try {
+      const docRef = await addDoc(collection(db,  userID), data);
+      console.log('Document written with ID: ', docRef.id);
+      setModalVisible(false); // Modal'ı kapat
+      setLink('')
+      setTitle('')
+
+    } catch (e) {
+      console.error('Error adding document: ', e);
+    }
+  };
+
+  
+  
+  // Firestore'dan veri çekme fonksiyonu
+  const getData = async () => {
+   
+
+
+    try {
+      const querySnapshot = await getDocs(collection(db, userid));
+      const dataList = [];
+      querySnapshot.forEach((doc) => {
+        dataList.push({ id: doc.id, ...doc.data() });
+      });
+      setdoclist(dataList); // Veriyi doclist state'ine kaydet
+    } catch (e) {
+      console.error('Error getting documents: ', e);
+    }
+  };
+
+
+  // FlatList ile her elemanı render etmek için
+  const Item = ({ title, link }) => (
+    <View style={styles.item}>
+      <Text>{title}</Text>
+      <Pressable onPress={()=>{handleLinkPress(link)}}>
+        <Text>{link}</Text>
+        </Pressable> 
+    </View>
+  );
+
+
+  useEffect(() => {
+    getData();
+    setUserId(userid) // Sayfa yüklendiğinde verileri al
+  }, []);
 
 
   return (
-    <View style={styles.container}>
-      
-      
-      <SafeAreaView style={styles.container}>
-      <Text>My Links</Text>
-      <FlatList
-        data={DATA}
-        renderItem={({item}) => <Item title={item.title} />}
-        keyExtractor={item => item.id}
-      />
-       <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            Alert.alert('Modal has been closed.');
-            setModalVisible(!modalVisible);
-          }}>
-            
-          <View style={styles.centeredView}>
-          
-            <View style={styles.modalView}>
-            <Pressable style={styles.modalCloseButton}  onPress={() => setModalVisible(!modalVisible)} ><Text style={styles.modalCloseButtonText}>X</Text></Pressable>
-              <Text style={styles.modalText}>Add New Link</Text>
-              <TextInput style={styles.modalLinkInput} placeholder='Title'></TextInput>
-              <TextInput style={styles.modalLinkInput} placeholder='Enter a link'></TextInput>
-              <Pressable
-                style={[styles.button, styles.buttonClose]}
-                onPress={() => setModalVisible(!modalVisible)}>
-                <Text style={styles.textStyle}>Add</Text>
-              </Pressable>
-            </View>
-          </View>
-        </Modal>
-    </SafeAreaView>
-    
-    <View style={styles.functions}>
-    <CustomPressable buttonText="New" textColor={"white"} doThis={()=>{setModalVisible(true)}}/>
-    </View>
-    </View>
-  )
-}
 
-export default HomePage
+    <View style={styles.container}>
+
+      <SafeAreaView style={{height:'80%'}}>
+    
+
+          <FlatList
+            data={doclist}
+            style={styles.FlatList} // State'deki doclist'i veritabanı verisi olarak alıyoruz
+            renderItem={({ item }) => (
+              <Item title={item.title} link={item.link} />
+
+            )}
+            keyExtractor={(item) => item.id} // Her eleman için key olarak doc.id kullanıyoruz
+          />
+        
+      </SafeAreaView>
+
+      {/* Yeni Veri Ekleme butonları */}
+
+
+      <View style={styles.functions}>
+
+
+
+        <CustomPressable  buttonText="New" 
+                          textColor={'white'} 
+                          doThis={() => setModalVisible(true)} />
+
+
+        <CustomPressable  buttonText="Get Data" 
+                          textColor={'white'} 
+                          doThis={getData} />
+      </View>
+
+
+
+      {/* Modal: Başlık ve Link eklemek için */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+                                setModalVisible(false);
+                              }
+                        }
+      >
+
+
+        <View style={styles.centeredView}>
+
+          <View style={styles.modalView}>
+
+            <Pressable style={styles.modalCloseButton} onPress={() => { setModalVisible(false),    
+                                                                        setLink('')
+                                                                        setTitle('')}}>
+
+
+              <Text style={styles.modalCloseButtonText}>X</Text>
+
+            </Pressable>
+
+            <Text style={styles.modalText}>Add New City</Text>
+            
+            
+            <TextInput
+              style={styles.modalLinkInput}
+              value={title}
+              placeholder="Title"
+              onChangeText={(text) => setTitle(text)}
+            />
+
+
+            <TextInput
+              style={styles.modalLinkInput}
+              value={link}
+              placeholder="Enter a link"
+              onChangeText={(text) => setLink(text)}
+            />
+
+
+
+            <Pressable  style={[styles.button, styles.buttonClose]} 
+                        onPress={() => { 
+                                          sendData(title, link), 
+                                          getData()
+                                        }
+                                }
+            >
+
+              <Text style={styles.textStyle}>Save</Text>
+            </Pressable>
+
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
+};
+
+export default HomePage;
 
 const styles = StyleSheet.create({
   container: {
-    
-    height:'80%'
+   padding:0,
+   margin:0,
    
-  },
-  HomePageTitle:{
-    fontFamily:'Arial'
   },
   item: {
     backgroundColor: '#f9c2ff',
-    padding: 20,
+    padding: 15,
     marginVertical: 8,
     marginHorizontal: 16,
-    borderRadius:10,
-    width:'70%'
-  
+    borderRadius: 15,
+    width: '80%',
   },
-  functions:{
-    flex:1,
-    alignItems:'center'
+  functions: {
+    marginTop:25,
+    flexDirection:'row',
+    justifyContent:'space-evenly'
+   
+    
   },
-  
   centeredView: {
     flex: 1,
-   
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalView: {
     margin: 20,
-    width:'80%',
-    height:'40%',
+    width: '80%',
+    height: '50%',
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 35,
     alignItems: 'center',
-    justifyContent:'space-between',
+    justifyContent: 'space-between',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -143,11 +241,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
     elevation: 2,
-    width:100,
-    height:40
-  },
-  buttonOpen: {
-    backgroundColor: '#F194FF',
+    width: 100,
+    height: 40,
   },
   buttonClose: {
     backgroundColor: '#2196F3',
@@ -158,34 +253,35 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   modalText: {
-   alignSelf:'center',
-   fontWeight:'600'
+    alignSelf: 'center',
+    fontWeight: '600',
   },
-  modalLinkInput:{
-    borderWidth:0.5,
-    borderRadius:20,
-    width:'100%',
-    height:50,
-    textAlign:'center'
+  modalLinkInput: {
+    borderWidth: 0.5,
+    borderRadius: 20,
+    width: '100%',
+    height: 50,
+    textAlign: 'center',
+    marginBottom: 15,
   },
-  modalCloseButton:{
-    backgroundColor:'black',
-    height:40,
-    width:40,
-    borderRadius:20,
-    justifyContent:'center',
-    position:'absolute',
-    zIndex:1,
-    right:-10,
-    top:-10
-    
-    
-  
-
-    
-    
-  },modalCloseButtonText:
-    {color:'white',fontWeight:'800',fontSize:18, alignSelf:'center'
-}
-  
-})
+  modalCloseButton: {
+    backgroundColor: 'black',
+    height: 40,
+    width: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    position: 'absolute',
+    zIndex: 1,
+    right: -10,
+    top: -10,
+  },
+  modalCloseButtonText: {
+    color: 'white',
+    fontWeight: '800',
+    fontSize: 18,
+    alignSelf: 'center',
+  },
+  FlatList:{
+    width:'auto'
+  }
+});
