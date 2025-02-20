@@ -1,10 +1,11 @@
 import { Pressable, StyleSheet, Text, View, FlatList, TextInput, Modal, Linking } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { collection, addDoc, getDocs, setDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, setDoc, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 import CustomPressable from '../components/customPressable';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+
 
 
 
@@ -13,13 +14,13 @@ import { useSelector, useDispatch } from 'react-redux';
 
 const HomePage = () => {
 
-  const {userid} = useSelector((state)=>state.user)
+  const {email} = useSelector((state)=>state.user)
   const [doclist, setdoclist] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [link, setLink] = useState('');
   const [title, setTitle] = useState('');
-  const [userID, setUserId] = useState('')
 
+  
 
 
 
@@ -32,17 +33,19 @@ const HomePage = () => {
 
 
   // Veriyi Firestore'a ekleyen fonksiyon
-  const sendData = async (linkTitle, linkContent ) => {
-   
+  const sendData = async (linkTitle, linkContent, email) => {
+  
     
     const data = {
       uuid:0,
       title:linkTitle ,
-      link:'http://'+linkContent ,
+      link:linkContent ,
     };
   
     try {
-      const docRef = await addDoc(collection(db,  userID), data);
+
+     
+      const docRef = await addDoc(collection(db,  email), data);
       console.log('Document written with ID: ', docRef.id);
       setModalVisible(false); // Modal'ı kapat
       setLink('')
@@ -53,15 +56,29 @@ const HomePage = () => {
     }
   };
 
-  
-  
-  // Firestore'dan veri çekme fonksiyonu
-  const getData = async () => {
-   
 
+  // Firestoreda veri silme
+
+  const deleteData = async(email,docid)=>{
+    console.log(email)
+    
+    try{
+
+      await deleteDoc(doc(db, email, docid ))
+
+    }catch (err){
+      console.log("Hata mesajı:",err)
+
+    }
+
+  }
+  
+
+  // Firestore'dan veri çekme fonksiyonu
+  const getData = async (email) => {
 
     try {
-      const querySnapshot = await getDocs(collection(db, userid));
+      const querySnapshot = await getDocs(collection(db, email));
       const dataList = [];
       querySnapshot.forEach((doc) => {
         dataList.push({ id: doc.id, ...doc.data() });
@@ -73,20 +90,48 @@ const HomePage = () => {
   };
 
 
+
+
   // FlatList ile her elemanı render etmek için
-  const Item = ({ title, link }) => (
+  const Item = ({ title, link , docid }) => (
     <View style={styles.item}>
-      <Text>{title}</Text>
+      <Text style={{fontFamily:'Montesserat', fontWeight:'700',
+        fontSize:18,
+        marginBottom:5
+      }}>{title}</Text>
+
+
+
+      <View style={{
+            flexDirection:'row',
+            justifyContent:'space-between',
+            
+      }}> 
       <Pressable onPress={()=>{handleLinkPress(link)}}>
-        <Text>{link}</Text>
-        </Pressable> 
+        <Text style={{width:200}}>{link}</Text></Pressable> 
+
+        <Pressable onPress={()=>{ deleteData(email,docid)
+                                  getData(email)
+                                 
+
+        }}
+                   
+        
+        ><Text style={{fontWeight:'700',
+
+        }}>Delete</Text></Pressable>
+        </View>
+        
+
+       
     </View>
   );
 
 
   useEffect(() => {
-    getData();
-    setUserId(userid) // Sayfa yüklendiğinde verileri al
+   
+    getData(email);
+    // Sayfa yüklendiğinde verileri al
   }, []);
 
 
@@ -101,8 +146,10 @@ const HomePage = () => {
             data={doclist}
             style={styles.FlatList} // State'deki doclist'i veritabanı verisi olarak alıyoruz
             renderItem={({ item }) => (
-              <Item title={item.title} link={item.link} />
-
+        
+              <Item title={item.title} link={item.link} docid={item.id}/>
+            
+          
             )}
             keyExtractor={(item) => item.id} // Her eleman için key olarak doc.id kullanıyoruz
           />
@@ -116,14 +163,12 @@ const HomePage = () => {
 
 
 
-        <CustomPressable  buttonText="New" 
+        <CustomPressable  buttonText="New Link" 
                           textColor={'white'} 
                           doThis={() => setModalVisible(true)} />
 
 
-        <CustomPressable  buttonText="Get Data" 
-                          textColor={'white'} 
-                          doThis={getData} />
+       
       </View>
 
 
@@ -153,7 +198,7 @@ const HomePage = () => {
 
             </Pressable>
 
-            <Text style={styles.modalText}>Add New City</Text>
+            <Text style={styles.modalText}>Add a New Link</Text>
             
             
             <TextInput
@@ -175,8 +220,8 @@ const HomePage = () => {
 
             <Pressable  style={[styles.button, styles.buttonClose]} 
                         onPress={() => { 
-                                          sendData(title, link), 
-                                          getData()
+                                          sendData(title, link, email), 
+                                          getData(email)
                                         }
                                 }
             >
@@ -200,12 +245,14 @@ const styles = StyleSheet.create({
    
   },
   item: {
+    flex:1,
     backgroundColor: '#f9c2ff',
     padding: 15,
     marginVertical: 8,
     marginHorizontal: 16,
     borderRadius: 15,
     width: '80%',
+    justifyContent:'space-evenly'
   },
   functions: {
     marginTop:25,
@@ -245,12 +292,13 @@ const styles = StyleSheet.create({
     height: 40,
   },
   buttonClose: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#D69ADE',
   },
   textStyle: {
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
+   
   },
   modalText: {
     alignSelf: 'center',

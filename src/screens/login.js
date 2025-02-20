@@ -17,8 +17,7 @@ export default function Login({navigation}) {
 
     const {isAuth,isLoading} = useSelector((state)=>state.user)
     const dispatch = useDispatch() 
-    const mail ='test@test.com'
-    const pass = '123456'
+
   // Redux Store'dan email çekiliyor
 
   return (

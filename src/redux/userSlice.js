@@ -11,10 +11,11 @@ export const login = createAsyncThunk('user/login',async({email,password})=>{
 
       const user = userCredential.user;
       const token = user.stsTokenManager.accessToken;
-
+      const userid = auth.currentUser.email;
       const userData ={
         token,
         user:user,
+        userid
       }
       return userData
 
@@ -35,6 +36,7 @@ const initialState = {
   token: null,
   user: null,
   error: null,
+
 };
 
 const userSlice = createSlice({
@@ -65,6 +67,8 @@ const userSlice = createSlice({
       state.isAuth = true
       state.user = action.payload.user
       state.token = action.payload.token
+      state.email = action.payload.userid
+
     })
     .addCase(login.rejected, ()=>{
       state.isLoading = false

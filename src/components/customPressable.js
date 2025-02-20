@@ -16,9 +16,9 @@ export default CustomPressable
 const styles = StyleSheet.create({
     Pressable:{
         justifyContent:'center',
-        width: 100,
+        width: 200,
         height: 50,
-        backgroundColor:'blue',
+        backgroundColor:'#D69ADE',
         alignItems:'center',
         borderRadius: 20,
         padding: 10,
